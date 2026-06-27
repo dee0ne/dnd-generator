@@ -421,7 +421,7 @@
             showLoading();
 
             try {
-                const response = await fetch('http://localhost:8000/generate-quest', {
+                const response = await fetch('/generate-quest', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ genre, difficulty })
