@@ -1,7 +1,9 @@
 import os
 import json
 import random
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -176,6 +178,20 @@ async def get_monsters():
 @app.get("/api/items")
 async def get_items():
     return {k.replace("_", " ").title(): v["description"] for k, v in MAGIC_ITEMS.items()}
+
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+FRONTEND_FILE = FRONTEND_DIR / "dndai.html"
+
+
+@app.get("/")
+async def serve_frontend():
+    if FRONTEND_FILE.exists():
+        return FileResponse(str(FRONTEND_FILE))
+    return {"error": "Frontend not found"}
+
+
+
 
 
 if __name__ == "__main__":
