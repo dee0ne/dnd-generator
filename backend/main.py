@@ -17,8 +17,9 @@ from knowledge_base import (
 
 load_dotenv()
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/v1")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+API_BASE = os.getenv("API_BASE", "http://localhost:11434/v1")
+API_MODEL = os.getenv("API_MODEL", "llama3.2")
+API_KEY = os.getenv("API_KEY", "ollama")
 
 app = FastAPI()
 
@@ -29,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = OpenAI(base_url=OLLAMA_URL, api_key="ollama")
+client = OpenAI(base_url=API_BASE, api_key=API_KEY)
 
 
 class QuestRequest(BaseModel):
@@ -143,7 +144,7 @@ Return JSON with exactly these fields:
 
     try:
         response = client.chat.completions.create(
-            model=OLLAMA_MODEL,
+            model=API_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.8,
         )
