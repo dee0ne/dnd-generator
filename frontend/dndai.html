@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Forge - D&D Quest Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Crimson Text', 'Georgia', serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            color: #d4c9a8;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(80, 40, 20, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(40, 20, 60, 0.15) 0%, transparent 60%);
+        }
+        .container {
+            max-width: 880px;
+            width: 100%;
+            background: linear-gradient(180deg, #1a1410 0%, #120e0a 100%);
+            border: 1px solid #3a2a1a;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow:
+                0 0 40px rgba(60, 30, 10, 0.3),
+                inset 0 0 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8b6914, #c9a83a, #8b6914, transparent);
+        }
+        h1 {
+            font-family: 'Cinzel', 'Georgia', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #c9a83a;
+            text-align: center;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(201, 168, 58, 0.2);
+        }
+        .subtitle {
+            text-align: center;
+            color: #8a7a5a;
+            font-style: italic;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2a1e12;
+            padding-bottom: 1rem;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .controls select, .controls button {
+            padding: 0.7rem 1.4rem;
+            border-radius: 4px;
+            border: 1px solid #3a2a1a;
+            background: #1e1610;
+            color: #d4c9a8;
+            font-size: 0.95rem;
+            font-family: 'Crimson Text', 'Georgia', serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 150px;
+        }
+        .controls select:hover {
+            border-color: #8b6914;
+            background: #261e18;
+        }
+        .controls button {
+            background: #2a1e0e;
+            border-color: #8b6914;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #c9a83a;
+            min-width: 160px;
+        }
+        .controls button:hover {
+            background: #3a2a14;
+            border-color: #c9a83a;
+            box-shadow: 0 0 15px rgba(201, 168, 58, 0.15);
+        }
+        .controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a1e12;
+            border-radius: 8px;
+            padding: 1.8rem;
+            min-height: 120px;
+        }
+        .quest-title {
+            font-family: 'Cinzel', 'Georgia', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #c9a83a;
+            margin-bottom: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .level-badge {
+            display: inline-block;
+            background: #2a1a0a;
+            border: 1px solid #8b6914;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.85rem;
+            color: #c9a83a;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+        }
+        .section {
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1e1610;
+        }
+        .section h3 {
+            font-family: 'Cinzel', 'Georgia', serif;
+            color: #a08a4a;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .section p, .section li {
+            color: #b8aa88;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        .section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .section ul li {
+            padding: 0.15rem 0;
+        }
+        .section ul li::before {
+            content: '- ';
+            color: #6a5a3a;
+        }
+        .tag {
+            display: inline-block;
+            background: #14100a;
+            border: 1px solid #2a1e12;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem 0.3rem;
+            border-radius: 3px;
+            font-size: 0.95rem;
+            color: #b8aa88;
+        }
+        .placeholder {
+            text-align: center;
+            color: #5a4a2a;
+            font-style: italic;
+            font-size: 1.1rem;
+            padding: 2rem 0;
+        }
+        .error {
+            color: #aa4444;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #3a2a1a;
+            border-top: 1px solid #1a120a;
+            padding-top: 1rem;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .dice-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .dice {
+            width: 50px;
+            height: 50px;
+            background: #1a1410;
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: #c9a83a;
+            transition: transform 0.1s;
+        }
+        .dice.rolling {
+            animation: shake 0.15s infinite alternate;
+        }
+        @keyframes shake {
+            0% { transform: rotate(-8deg) scale(1.05); }
+            100% { transform: rotate(8deg) scale(1.05); }
+        }
+        .loading-text {
+            font-style: italic;
+            color: #8a7a5a;
+            font-size: 1.1rem;
+            min-height: 2.5rem;
+            transition: opacity 0.4s;
+        }
+        .loading-text.fade {
+            opacity: 0;
+        }
+        .loading-bar-track {
+            width: 200px;
+            height: 4px;
+            background: #1a1410;
+            border-radius: 2px;
+            margin: 1.5rem auto 0;
+            overflow: hidden;
+        }
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8b6914, #c9a83a);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1.2rem; }
+            h1 { font-size: 1.5rem; letter-spacing: 2px; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .controls select, .controls button { min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quest Forge</h1>
+        <div class="subtitle">A Dungeons & Dragons Quest Generator</div>
+
+        <div class="controls">
+            <select id="genre">
+                <option value="fantasy">Fantasy</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="horror">Horror</option>
+                <option value="sci-fi">Sci-Fi</option>
+            </select>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button id="generateBtn">Forge Quest</button>
+        </div>
+
+        <div id="result">
+            <div class="placeholder">Speak the incantation. Forge a quest.</div>
+        </div>
+        <div class="footer">Roll for Initiative.</div>
+    </div>
+
+    <script>
+        const genreSelect = document.getElementById('genre');
+        const difficultySelect = document.getElementById('difficulty');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultDiv = document.getElementById('result');
+
+        const loadingFlavor = [
+            "Rolling the dice of fate...",
+            "Consulting the ancient tomes...",
+            "Whispering to the spirits of adventure...",
+            "Deciphering the forgotten runes...",
+            "Brewing a potion of inspiration...",
+            "Sharpening the narrative blade...",
+            "Summoning a plot from the void...",
+            "Drawing the map in dragonfire...",
+            "Awakening the dungeon from slumber...",
+            "Casting Augury to divine the quest...",
+            "Polishing the loot table...",
+            "Training the monsters for combat...",
+            "Unrolling the parchment of destiny...",
+        ];
+
+        let loadingInterval = null;
+        let diceInterval = null;
+        let barInterval = null;
+        let progress = 0;
+
+        function startLoadingAnimation() {
+            const dice = document.querySelectorAll('.dice');
+            dice.forEach(d => d.classList.add('rolling'));
+
+            let flavorIdx = 0;
+            const flavorEl = document.querySelector('.loading-text');
+            if (flavorEl) {
+                flavorEl.textContent = loadingFlavor[0];
+            }
+
+            loadingInterval = setInterval(() => {
+                flavorIdx = (flavorIdx + 1) % loadingFlavor.length;
+                if (flavorEl) {
+                    flavorEl.classList.add('fade');
+                    setTimeout(() => {
+                        flavorEl.textContent = loadingFlavor[flavorIdx];
+                        flavorEl.classList.remove('fade');
+                    }, 200);
+                }
+            }, 2000);
+
+            progress = 0;
+            const bar = document.querySelector('.loading-bar');
+            if (bar) bar.style.width = '0%';
+
+            barInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 8, 90);
+                if (bar) bar.style.width = progress + '%';
+            }, 500);
+        }
+
+        function stopLoadingAnimation() {
+            if (loadingInterval) clearInterval(loadingInterval);
+            if (diceInterval) clearInterval(diceInterval);
+            if (barInterval) clearInterval(barInterval);
+
+            const dice = document.querySelectorAll('.dice');
+            dice.forEach(d => d.classList.remove('rolling'));
+
+            const bar = document.querySelector('.loading-bar');
+            if (bar) bar.style.width = '100%';
+
+            setTimeout(() => {
+                const bar = document.querySelector('.loading-bar');
+                if (bar) bar.style.width = '0%';
+            }, 400);
+        }
+
+        function showLoading() {
+            resultDiv.innerHTML = `
+                <div class="loading-container">
+                    <div class="dice-row">
+                        <div class="dice rolling">d20</div>
+                        <div class="dice rolling">d12</div>
+                        <div class="dice rolling">d10</div>
+                        <div class="dice rolling">d8</div>
+                        <div class="dice rolling">d6</div>
+                        <div class="dice rolling">d4</div>
+                    </div>
+                    <div class="loading-text fade">Rolling the dice of fate...</div>
+                    <div class="loading-bar-track">
+                        <div class="loading-bar"></div>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                const flavorEl = document.querySelector('.loading-text');
+                if (flavorEl) flavorEl.classList.remove('fade');
+                startLoadingAnimation();
+            }, 50);
+        }
+
+        function renderQuest(data) {
+            let html = `<div class="quest-title">${data.title || 'Untitled Quest'}</div>`;
+            if (data.suggested_level) {
+                html += `<div class="level-badge">Level ${data.suggested_level}</div>`;
+            }
+            html += `<div class="section"><h3>Story</h3><p>${data.story || 'No story.'}</p></div>`;
+            html += `<div class="section"><h3>Map</h3><p>${data.map || 'Unknown.'}</p></div>`;
+            if (data.locations && data.locations.length) {
+                html += `<div class="section"><h3>Locations</h3><ul>${data.locations.map(l => `<li>${l}</li>`).join('')}</ul></div>`;
+            }
+            if (data.factions && data.factions.length) {
+                html += `<div class="section"><h3>Factions</h3><ul>${data.factions.map(f => `<li>${f}</li>`).join('')}</ul></div>`;
+            }
+            if (data.npcs && data.npcs.length) {
+                html += `<div class="section"><h3>NPCs</h3><div>${data.npcs.map(n => `<span class="tag">${n.name} — ${n.role}${n.motivation ? ' (' + n.motivation + ')' : ''}</span>`).join('')}</div></div>`;
+            }
+            if (data.enemies && data.enemies.length) {
+                html += `<div class="section"><h3>Enemies</h3><div>${data.enemies.map(e => {
+                    let parts = [e.name];
+                    let stats = [];
+                    if (e.hp) stats.push('HP ' + e.hp);
+                    if (e.ac) stats.push('AC ' + e.ac);
+                    if (stats.length) parts.push('(' + stats.join(', ') + ')');
+                    if (e.description) parts.push('— ' + e.description);
+                    return '<div class="tag">' + parts.join(' ') + '</div>';
+                }).join('')}</div></div>`;
+            }
+            if (data.plot_twist) {
+                html += `<div class="section"><h3>Plot Twist</h3><p>${data.plot_twist}</p></div>`;
+            }
+            if (data.moral_dilemma) {
+                html += `<div class="section"><h3>Moral Dilemma</h3><p>${data.moral_dilemma}</p></div>`;
+            }
+            html += `<div class="section"><h3>Reward</h3><p>${data.reward || 'Glory and gold.'}</p></div>`;
+            resultDiv.innerHTML = html;
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            const genre = genreSelect.value;
+            const difficulty = difficultySelect.value;
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Forging...';
+            showLoading();
+
+            try {
+                const response = await fetch('http://localhost:8000/generate-quest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ genre, difficulty })
+                });
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Server error');
+                }
+                const data = await response.json();
+                stopLoadingAnimation();
+                setTimeout(() => renderQuest(data), 300);
+            } catch (error) {
+                stopLoadingAnimation();
+                resultDiv.innerHTML = `<div class="placeholder error">The ritual failed. ${error.message}</div>`;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Forge Quest';
+            }
+        });
+    </script>
+</body>
+</html>
