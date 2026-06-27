@@ -44,15 +44,6 @@ Get a key at https://platform.openai.com/api-keys
 python backend/main.py
 ```
 
-Open http://localhost:8000 in browser for the web UI.
-
-Or use the API directly:
-
-```bash
-curl -X POST http://localhost:8000/generate-quest \
-  -H "Content-Type: application/json" \
-  -d '{"genre": "fantasy", "difficulty": "medium"}'
-```
 
 ## API Endpoints
 
